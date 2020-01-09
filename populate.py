@@ -23,6 +23,7 @@ def populate_form(camper):
 
         submit_button = driver.find_elements_by_xpath("//input[@value='Next']")[0]
         submit_button.click()
+        time.sleep(1)
 
     # second page
     elem = driver.find_element_by_name("DestinationID")
@@ -116,7 +117,7 @@ def populate_form(camper):
 #         self.campsite = campsite
 #         self.first_name = first_name
 #         self.last_name = last_name
-#         self.email_adress = email_address
+#         self.email_address = email_address
 #         self.address1 = address1
 #         self.address2 = address2
 #         self.city = city
