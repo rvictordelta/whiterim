@@ -1,52 +1,48 @@
 import time
 from datetime import datetime
 import schedule
-import scrape
-import excel
-import my_send_email
+import multiprocessing as mp
 import csv
 
-
-class Group:
-    def __init__(self, name, id, pw, emails):
-        self.name = name
-        self.id = id
-        self.pw = pw
-        self.emails = emails
+import populate
 
 
-groups = []
-with open("groups.csv") as csvfile:  # not tracked
-    rows = csv.reader(csvfile)
-    for row in rows:
-        groups.append(Group(row[0], row[1], row[2], [x for x in row[3:]]))
+class Camper:
+    def __init__(self, month, day, year, campsite, first_name, last_name,
+                email_address, address1, address2, city, state, zip, phone):
+        self.month = month
+        self.day = day
+        self.year = year
+        self.campsite = campsite
+        self.first_name = first_name
+        self.last_name = last_name
+        self.email_address = email_address
+        self.address1 = address1
+        self.address2 = address2
+        self.city = city
+        self.state = state
+        self.zip = zip
+        self.phone = phone
 
 
-def scrape_go():
-    print(f"---beginning scrape at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    for group in groups:
-        scrape.scrape(group)
-    print(f"---finished  scrape at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+campers = []
+with open('campers.csv', 'r') as csvfile:
+    reader = csv.reader(csvfile)
+    for i, r in enumerate(reader):
+        if i != 0:
+            campers.append(Camper(r[0], r[1], r[2], int(r[3]), r[4], r[5],
+                                  r[6], r[7], r[8], r[9], r[10], r[11], r[12]))
 
 
-def excel_go():
-    print(f"---beginning mkexcel at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    for group in groups:
-        excel.consolidate_data_excel(group)
-    print(f"---finished  mkexcel at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+def populate_go():
+    mp.freeze_support()
+    pool = mp.Pool(processes=3)
+    ret = pool.map(populate.populate_form, campers)
 
 
-def email_go():
-    print(f"---beginning email at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    for group in groups:
-        my_send_email.my_send_email(group)
-    print(f"---finished  email at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+if __name__ == '__main__':
+    schedule.every().day.at("16:20:30").do(populate_go)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
 
-
-schedule.every().hour.at(":31").do(scrape_go)
-schedule.every().hour.at(":33").do(excel_go)
-schedule.every().hour.at(":34").do(email_go)
-
-while True:
-    schedule.run_pending()
-    time.sleep(1)
