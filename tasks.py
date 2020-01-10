@@ -41,7 +41,7 @@ def populate_go():
 
 
 if __name__ == '__main__':
-    schedule.every().day.at("16:20:30").do(populate_go)
+    schedule.every().day.at("00:59:30").do(populate_go)
     while True:
         schedule.run_pending()
         time.sleep(1)
