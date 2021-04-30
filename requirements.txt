@@ -2,4 +2,4 @@ dill==0.3.1.1
 multiprocess==0.70.9
 schedule==0.6.0
 selenium==3.141.0
-urllib3==1.25.7
+urllib3==1.25.8
